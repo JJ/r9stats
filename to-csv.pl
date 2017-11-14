@@ -27,7 +27,9 @@ my @columnas = qw( days );
 push @columnas, @oss;
 push @columnas, @lenguajes;
 
-say join(", ", @columnas);
+
+my $max_registro = 0;
+my @users;
 for my $u ( @$user_info ) {
   my %user;
   if ($u->{'os'} ) {
@@ -48,11 +50,20 @@ for my $u ( @$user_info ) {
   my $registro = $strp->parse_datetime( $u->{'registrado'} );
   my $inscripcion = $strp->parse_datetime( $u->{'inscrito'} );
   $user{'days'} = $registro->delta_days($inscripcion)->delta_days;
-
-  my @data = map( $user{$_}, @columnas );
-
-  say join(", ", map( $_ // 0, @data ) );
+  if ( $user{'days'} > $max_registro ) {
+    $max_registro = $user{'days'};
+  }
+  push @users, \%user;
   
 }
 
 
+say join(", ", @columnas);
+for my $u (@users) {
+  $u->{'days'}= $u->{'days'}/$max_registro;
+  
+  my @data = map( $u->{$_}, @columnas );
+
+  say join(", ", map( $_ // 0, @data ) );
+
+}
