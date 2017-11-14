@@ -4,8 +4,8 @@ library(ggthemes)
 library(dplyr)
 
 oss.data <- fromJSON(file="r9-user-oss.json")
-oss <- data.frame(os=names(oss.data),usuarios=c(oss.data$windows,oss.data$linux))
-ggplot(oss,aes(x=os,y=usuarios))+geom_bar()
+oss <- data.frame(os=names(oss.data),usuarios=c(oss.data$windows,oss.data$linux,oss.data$mac))
+ggplot(oss,aes(x=os,y=usuarios))+geom_bar(stat="identity")
 
 
 l.data <- fromJSON(file="r9-user-lenguajes.json")
