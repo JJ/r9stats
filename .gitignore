@@ -34,3 +34,6 @@ vignettes/*.pdf
 
 # backup
 *~
+
+# con info privada
+IX_Jornadas_de_Usuarios_de_R.csv
