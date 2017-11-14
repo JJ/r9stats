@@ -17,6 +17,7 @@ for my $u ( @$user_info ) {
   if ($u->{'os'} ) {
     $oss{'linux'}++ if $u->{'os'} =~ /inux/;
     $oss{'windows'}++ if $u->{'os'} =~ /indow/;
+    $oss{'mac'}++ if $u->{'os'} =~ /ac/;
   }
 
   if ( $u->{'lenguajes'} ) {
