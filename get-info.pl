@@ -6,9 +6,10 @@ use v5.14;
 
 use JSON;
 use LWP::Simple;
-use File::Slurper qw(read_lines);
+use File::Slurper qw(read_lines write_text);
 
-my $file = "../../Documentos/IX_Jornadas_de_Usuarios_de_R.csv";
+my $file = "../../Descargas/IX_Jornadas_de_Usuarios_de_R(1).xls";
+my $info = "r9-user-info.json";
 
 my $gg_gid = 19214694;
 
@@ -27,11 +28,6 @@ for my $m ( @members ) {
 		     os => $this_user->{'answers'}[1]{'answer'} };
 }
 
-write_text("r9-user-info.json",encode_json( @user_info ));
+write_text($info,encode_json( @user_info ));
 
-my %oss;
-my %lenguajes;
-for my $u ( @user_info ) {
-  $oss{'linux'}++ if $u->{'os'} =~ /inux/;
-  $oss{'windows'}++ if $u->{'os'} =~ /indow/;
-}
+
