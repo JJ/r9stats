@@ -13,8 +13,6 @@ data.df <- data.frame(os=character(),
                       sexo=character())
 
 for ( i in 1:length(all.data) ) {
-    print(i)
-    print( all.data[[i]] )
     if ( ! is.null(all.data[[i]]$os) )  {
         os = all.data[[i]]$os
     } else {
@@ -38,6 +36,8 @@ for ( i in 1:length(all.data) ) {
                                 sexo=sexo )
                      )
 }
+ggplot(data.df,aes(x=sexo))+geom_bar(stat="count")
+
 
 
 oss.data <- fromJSON(file="r9-user-oss.json")
