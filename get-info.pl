@@ -41,13 +41,15 @@ for my $m ( @members ) {
 	if ( $gender_json->{'probability'} > 0.55 ) {
 	  $gender = $gender_json->{'gender'};
 	} else {
+	  say "Can't say $name";
 	  $gender = "X";
 	}
       }
       push @user_info, {inscrito => $parts[6],
 			registrado => $parts[7],
 			lenguajes => $this_user->{'answers'}[0]{'answer'},
-			os => $this_user->{'answers'}[1]{'answer'} };
+			os => $this_user->{'answers'}[1]{'answer'},
+			sexo => $gender };
       say $response->header("X-RateLimit-Remaining"), " to go ";
       if ( $response->header("X-RateLimit-Remaining") <= 1 ) {
 	sleep($response->header("X-RateLimit-Reset"));
