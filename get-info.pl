@@ -8,7 +8,7 @@ use JSON;
 use LWP::UserAgent;
 use File::Slurper qw(read_lines write_text);
 
-my $file = "../../Descargas/IX_Jornadas_de_Usuarios_de_R(1).xls";
+my $file = "../../Descargas/IX_Jornadas_de_Usuarios_de_R(2).xls";
 
 my $gg_gid = 19214694;
 
@@ -31,6 +31,19 @@ for my $m ( @members ) {
   if ( $response->is_success ) {
       my $user_json = $response->decoded_content;
       my $this_user = decode_json $user_json;
+
+      # Encuentra el género
+      my ($name,@cosas) = split( /\s+/, $parts[0] );
+      my $gender_response = $ua->get("https://api.genderize.io/?name=$name");
+      my $gender;
+      if ( $gender_response->is_success ) {
+	my $gender_json = decode_json $gender_response->decoded_content;
+	if ( $gender_json->{'probability'} > 0.55 ) {
+	  $gender = $gender_json->{'gender'};
+	} else {
+	  $gender = "X";
+	}
+      }
       push @user_info, {inscrito => $parts[6],
 			registrado => $parts[7],
 			lenguajes => $this_user->{'answers'}[0]{'answer'},
