@@ -9,7 +9,7 @@ use LWP::UserAgent;
 use File::Slurper qw(read_lines write_text);
 use Unicode::Normalize;
 
-my $file = "../../Descargas/IX_Jornadas_de_Usuarios_de_R(2).xls";
+my $file = "IX_Jornadas_de_Usuarios_de_R.csv";
 
 my $gg_gid = 19214694;
 
@@ -49,13 +49,24 @@ for my $m ( @members ) {
 	  $gender = "X";
 	}
       }
-      push @user_info, {inscrito => $parts[6],
-			registrado => $parts[7],
-			lenguajes => $this_user->{'answers'}[0]{'answer'},
-			os => $this_user->{'answers'}[1]{'answer'},
-			sexo => $gender };
+      my $user_response = $ua->get("https://api.meetup.com/2/member/$id?&sign=true&key=$API_KEY");
+      my $user = {inscrito => $parts[6],
+		  registrado => $parts[7],
+		  lenguajes => $this_user->{'answers'}[0]{'answer'},
+		  os => $this_user->{'answers'}[1]{'answer'},
+		  sexo => $gender };
+      
+      if ( $user_response->is_success ) {
+	my $profile_json = $user_response->decoded_content;
+	my $this_profile = decode_json $profile_json;
+	$user->{'lon'} = $this_profile->{'lon'};
+	$user->{'lat'} = $this_profile->{'lat'};
+	$user->{'city'} = $this_profile->{'city'};
+      }
+      
+      push @user_info, $user;
       say $response->header("X-RateLimit-Remaining"), " to go ";
-      if ( $response->header("X-RateLimit-Remaining") <= 1 ) {
+      if ( $response->header("X-RateLimit-Remaining") <= 2 ) {
 	sleep($response->header("X-RateLimit-Reset"));
 	say "Sleeping";
       }
