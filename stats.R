@@ -3,6 +3,7 @@ library(ggplot2)
 library(ggthemes)
 library(dplyr)
 library(reshape2)
+library(ggmap)
 
 
 all.data <- fromJSON(file="r9-user-info.json")
@@ -10,8 +11,13 @@ data.df <- data.frame(os=character(),
                       registrado=as.Date(character()),
                       inscrito=as.Date(character()),
                       lenguaje=character(),
-                      sexo=character())
+                      sexo=character(),
+                      city=character(),
+                      lat=double(),
+                      lon=double()
+                      )
 
+es.map <- get_map(location="Spain",zoom=6)
 for ( i in 1:length(all.data) ) {
     if ( ! is.null(all.data[[i]]$os) )  {
         os = all.data[[i]]$os
@@ -33,7 +39,10 @@ for ( i in 1:length(all.data) ) {
                                 lenguajes=lenguajes,
                                 registrado=as.Date(all.data[[i]]$registrado,format="%m/%d/%Y"),
                                 inscrito=as.Date(all.data[[i]]$inscrito,format="%m/%d/%Y"),
-                                sexo=sexo )
+                                sexo=sexo,
+                                lon=all.data[[i]]$lon,
+                                lat=all.data[[i]]$lat,
+                                city=all.data[[i]]$city)
                      )
 }
 ggplot(data.df,aes(x=sexo))+geom_bar(stat="count")
