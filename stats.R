@@ -25,7 +25,7 @@ for ( i in 1:length(all.data) ) {
         os = ""
     }
     if ( ! is.null(all.data[[i]]$lenguajes) )  {
-        lenguajes = all.data[[i]]$os
+        lenguajes = all.data[[i]]$lenguajes
     } else {
         lenguajes = ""
     }
@@ -45,6 +45,7 @@ for ( i in 1:length(all.data) ) {
                                 city=all.data[[i]]$city)
                      )
 }
+write.csv(data.df,file='r9-users-data.csv')
 ggplot(data.df,aes(x=sexo))+geom_bar(stat="count")
 
 
