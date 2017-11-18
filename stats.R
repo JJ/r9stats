@@ -57,9 +57,8 @@ ggplot(oss,aes(x=os,y=usuarios))+geom_bar(stat="identity")
 
 
 l.data <- fromJSON(file="r9-user-lenguajes.json")
-l <- do.call(rbind, lapply(l.data, data.frame, stringsAsFactors=FALSE))
-lenguajes <- data.frame( lenguaje = rownames(l), usuarios=l$X..i..)
-lenguajes <- dplyr::filter(lenguajes, !grepl("-",lenguaje))
+l <- do.call(rbind, lapply(l.data, data.frame))
+lenguajes <- data.frame( lenguaje = rownames(l), usuarios=as.numeric(as.character(l$X..i..)))
 lenguajes <- lenguajes[ lenguajes$usuarios > 1, ]
 
 ggplot(lenguajes,aes(x=reorder(lenguaje,-usuarios),y=usuarios))+geom_bar(stat="identity") + theme_tufte()+ theme(axis.text.x = element_text(angle = 90, hjust = 1))+xlab('lenguajes')
