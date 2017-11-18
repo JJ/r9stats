@@ -14,10 +14,10 @@ data.df <- data.frame(os=character(),
                       sexo=character(),
                       city=character(),
                       lat=double(),
-                      lon=double()
+                      lon=double(),
+                      asistira=character()
                       )
 
-es.map <- get_map(location="Spain",zoom=6)
 for ( i in 1:length(all.data) ) {
     if ( ! is.null(all.data[[i]]$os) )  {
         os = all.data[[i]]$os
@@ -37,12 +37,13 @@ for ( i in 1:length(all.data) ) {
     data.df <- rbind( data.df,
                      data.frame(os=os,
                                 lenguajes=lenguajes,
-                                registrado=as.Date(all.data[[i]]$registrado,format="%m/%d/%Y"),
-                                inscrito=as.Date(all.data[[i]]$inscrito,format="%m/%d/%Y"),
+                                registrado=as.Date(all.data[[i]]$registrado/1000,origin="1970-01-01"),
+                                inscrito=as.Date(all.data[[i]]$inscrito/1000,origin="1970-01-01"),
                                 sexo=sexo,
                                 lon=all.data[[i]]$lon,
                                 lat=all.data[[i]]$lat,
-                                city=all.data[[i]]$city)
+                                city=all.data[[i]]$city,
+                                asistira=all.data[[i]]$asistira)
                      )
 }
 write.csv(data.df,file='r9-users-data.csv')
