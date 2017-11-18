@@ -42,3 +42,5 @@ rsvps.json
 # Cosas de Rstudio
 **/auto
 **/*.html
+**/*.pdf
+**/rsconnect
