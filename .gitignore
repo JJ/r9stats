@@ -38,3 +38,7 @@ vignettes/*.pdf
 # con info privada
 IX_Jornadas_de_Usuarios_de_R.csv
 rsvps.json
+
+# Cosas de Rstudio
+**/auto
+**/*.html
