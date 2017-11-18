@@ -1,0 +1,101 @@
+---
+title: "Estadísticas 9ª Jornadas R Hispano"
+author: "JJ Merelo"
+date: "18 de noviembre de 2017"
+output: html_document
+bibliography: biblio.bib
+abstract: Las 9ª Jornadas de R Hispano (http://r-es.org/9jornadasR/) se han celebrado en Granada los días 16 y 17 de noviembre. Este es un informe que da un perfil de los usuarios de estas jornadas, usando datos de registro en la plataforma Meetup, usada para este encuentro. Los datos muestran la popularidad de lenguajes como el Python entre los asistentes, así como su procedencia geográfica, principalmente de Granada y del resto de Andalucía. 
+---
+
+```{r setup, include=FALSE}
+library(rjson)
+library(ggplot2)
+library(ggthemes)
+library(dplyr)
+library(reshape2)
+
+all.data <- fromJSON(file="../r9-user-info.json")
+data.df <- data.frame(os=character(),
+                      registrado=as.Date(character()),
+                      inscrito=as.Date(character()),
+                      lenguaje=character(),
+                      sexo=character(),
+                      city=character(),
+                      lat=double(),
+                      lon=double(),
+                      asistira=character()
+                      )
+
+for ( i in 1:length(all.data) ) {
+    if ( ! is.null(all.data[[i]]$os) )  {
+        os = all.data[[i]]$os
+    } else {
+        os = ""
+    }
+    if ( ! is.null(all.data[[i]]$lenguajes) )  {
+        lenguajes = all.data[[i]]$lenguajes
+    } else {
+        lenguajes = ""
+    }
+    if ( ! is.null(all.data[[i]]$sexo) )  {
+        sexo = all.data[[i]]$sexo
+    } else {
+        sexo = "X"
+    }
+    data.df <- rbind( data.df,
+                     data.frame(os=os,
+                                lenguajes=lenguajes,
+                                registrado=as.Date(all.data[[i]]$registrado/1000,origin="1970-01-01"),
+                                inscrito=as.Date(all.data[[i]]$inscrito/1000,origin="1970-01-01"),
+                                sexo=sexo,
+                                lon=all.data[[i]]$lon,
+                                lat=all.data[[i]]$lat,
+                                city=all.data[[i]]$city,
+                                asistira=all.data[[i]]$asistira)
+                     )
+}
+
+oss.data <- fromJSON(file="../r9-user-oss.json")
+oss <- data.frame(os=names(oss.data),usuarios=c(oss.data$windows,oss.data$linux,oss.data$mac))
+
+l.data <- fromJSON(file="../r9-user-lenguajes.json")
+l <- do.call(rbind, lapply(l.data, data.frame))
+lenguajes <- data.frame( lenguaje = rownames(l), usuarios=as.numeric(as.character(l$X..i..)))
+lenguajes <- lenguajes[ lenguajes$usuarios > 1, ]
+
+```
+
+Las [IX Jornadas de usuarios de R](http://r-es.org/9jornadasR/) han tenido lugar en Granada los días 16 y 17 de noviembre. La inscripción se realizó a través de [este formulario de Meetup](https://www.meetup.com/es-ES/Granada-Geek/events/239294739/), para usar el cual hace falta darse de alta en la plataforma y en el grupo que lo organiza; esto proporciona información adicional sobre la procedencia de los asistentes, y es la que estamos usando en este documento. La información se extrae mediante peticiones al API de Meetup usando un script en Perl. Se inscribieron unas 250 personas, 50 de las cuales finalmente renunciaron a asistir, usando el formulario correspondiente en Meetup. La asistencia real fue de alrededor de 140 personas, contando las que efectivamente recogieron la inscripción *in situ*. 
+
+Los datos, tras su extracción, se almacenaron en ficheros en el formato JSON y CSV que están disponibles en [GitHub](https://github.com/JJ/r9stats) y en FigShare con una licencia libre [@Merelo2017].
+
+# Lenguajes de programación
+
+Para extraer los lenguajes de programación se procesó la respuesta a la pregunta "Qué tecnologías o lenguajes de programación usas" mediante capitalización de la primera letra de los mismos para normalizarlos, así como detección de diferentes variantes de la palabra "Python" (había al menos 4 versiones).
+
+Evidentemente, el uso del lenguaje de programación R debe ser común entre los asistentes, pero es interesante ver qué otros lenguajes son populares.
+
+```{r lenguajes, echo=FALSE}
+lenguajes$porcentaje = 100*lenguajes$usuarios/length(all.data)
+ggplot(lenguajes,aes(x=reorder(lenguaje,-usuarios),y=usuarios,fill=porcentaje))+geom_bar(stat="identity") + theme_tufte()+ theme(axis.text.x = element_text(angle = 90, hjust = 1))+xlab('Lenguajes')
+```
+
+Como se ve, el lenguaje más popular es R, pero le sigue Python, que está convirtiéndose en uno de los más populares en ciencia de datos. También apuntan otros lenguajes como Scala y Perl. Incluso aunque las jornadas están dedicadas al lenguaje R, sólo el 80% de los asistentes efectivamente usa el lenguaje; esto puede significar que han atraído a otros miembros de la comunidad de tratamiento de datos que efectivamente están interesados en el mismo, también, por supuesto, que hay gente que lo usa pero que no es de sus lenguajes principales por lo que no lo hace constar en la contestación a la pregunta sobre los mismos. 
+
+#Sistemas operativos
+
+En este caso, se procesó la respuesta a la pregunta "Qué sistema operativo usas" buscando variantes de los mismos, así como distribuciones populares de Linux tales como Ubuntu.
+
+```{r os, echo=FALSE}
+oss$porcentaje = 100*oss$usuarios/length(all.data)
+ggplot(oss,aes(x=os,y=usuarios,fill=porcentaje))+geom_bar(stat="identity")+xlab('Sistemas Operativos')
+```
+Windows en sus diferentes variantes llega a más del 60% de usuarios y más de 150; pero Linux en sus diferentes variantes se acerca también al 40%. Las tres posibilidades no son excluyentes y en muchos casos se usan los dos o incluso los tres sistemas operativos. 
+
+# Género
+
+La comunidad informática es masivamente masculina, sin embargo el lenguaje R es usado también por otros grupos, matemáticos, estadísticos, ecólogos, donde la presencia femenina es más equilibrada. El género se averiguó a través de un API que lo identifica a partir del nombre. En muchos casos se usó un nick para registrarse por lo que no se pudo identificar y se le asigna "X"
+
+```{r genero, echo=FALSE}
+ggplot(data.df,aes(x=sexo,fill=100*(..count..)/sum(..count..)))+geom_bar(stat="count")
+```
