@@ -10,7 +10,6 @@ use File::Slurper qw(read_lines write_text);
 use Unicode::Normalize;
 
 my $file = shift || "IX_Jornadas_de_Usuarios_de_R.csv";
-
 my $gg_gid = 19214694;
 
 my $API_KEY = $ENV{"MEETUP_API_KEY"};
@@ -49,12 +48,13 @@ for my $m ( @members ) {
 	  $gender = "X";
 	}
       }
-      my $user_response = $ua->get("https://api.meetup.com/2/member/$id?&sign=true&key=$API_KEY");
       my $user = {inscrito => $parts[6],
 		  registrado => $parts[7],
 		  lenguajes => $this_user->{'answers'}[0]{'answer'},
 		  os => $this_user->{'answers'}[1]{'answer'},
 		  sexo => $gender };
+      
+      my $user_response = $ua->get("https://api.meetup.com/2/member/$id?&sign=true&key=$API_KEY");
       
       if ( $user_response->is_success ) {
 	my $profile_json = $user_response->decoded_content;
@@ -77,6 +77,6 @@ for my $m ( @members ) {
   }
 }
 
-write_text("r9-user-info.json", encode_json( \@user_info ));
+write_text("r9-user-info.json", to_json( \@user_info ));
 
 
