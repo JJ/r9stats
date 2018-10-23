@@ -9,7 +9,7 @@ use LWP::UserAgent;
 use File::Slurper qw(read_lines write_text);
 use Unicode::Normalize;
 
-my $file = "IX_Jornadas_de_Usuarios_de_R.csv";
+my $file = shift || "IX_Jornadas_de_Usuarios_de_R.csv";
 
 my $gg_gid = 19214694;
 
